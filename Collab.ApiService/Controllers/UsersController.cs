@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Collab.ApiService.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Collab.ApiService.Controllers;
@@ -16,7 +17,9 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpGet("all")]
-	public async Task<ActionResult> GetAll() {
+	[Authorize]
+	public async Task<ActionResult> GetAll()
+	{
 		return Ok(this._repo.GetAll());
 	}
 }

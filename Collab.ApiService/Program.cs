@@ -1,6 +1,9 @@
 using Collab.ApiService;
 using Collab.ApiService.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi;
+using Collab.ApiService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +11,31 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo()
+    {
+        Title = "Collab Api",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        In = Microsoft.OpenApi.ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Enter your access token",
+        Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(opt => {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
 });
+
+builder.Services.AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddTransient<
     Collab.ApiService.Interfaces.IUserRepository,
@@ -39,6 +62,7 @@ app.MapGet("/api/v1", () => "API service is running.");
 app.UseHttpsRedirection();
 app.MapDefaultEndpoints();
 app.MapControllers();
+app.MapIdentityApi<User>();
 
 using (var scope = app.Services.CreateScope())
 {
