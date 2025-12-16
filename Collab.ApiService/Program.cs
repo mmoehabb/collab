@@ -4,10 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi;
 using Collab.ApiService.Models;
+using Collab.ApiService.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddSignalR(options => {
+    options.EnableDetailedErrors = true;
+});
 builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -52,6 +56,19 @@ builder.Services.AddTransient<
     Collab.ApiService.Repositories.MessageRepository
 >();
 
+// Add CORS services
+var policyName = "_MyCorsPolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(policyName, policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader() 
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -66,6 +83,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(policyName);
+app.MapHub<ChannelHub>("/hub");
 app.MapGet("/", () => "API service is running. Dispath requests to /api/v1/{entity}/{method}.");
 app.MapGet("/api/v1", () => "API service is running.");
 
