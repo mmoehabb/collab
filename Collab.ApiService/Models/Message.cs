@@ -6,6 +6,7 @@ public class Message {
 	public required User Sender { get; set; }
 	public required Channel Channel { get; set; }
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public List<ReadMessage> ReadMessages { get; } = [];
 }

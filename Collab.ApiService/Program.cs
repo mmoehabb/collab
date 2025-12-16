@@ -42,6 +42,16 @@ builder.Services.AddTransient<
     Collab.ApiService.Repositories.UserRepository
 >();
 
+builder.Services.AddTransient<
+    Collab.ApiService.Interfaces.IChannelRepository,
+    Collab.ApiService.Repositories.ChannelRepository
+>();
+
+builder.Services.AddTransient<
+    Collab.ApiService.Interfaces.IMessageRepository,
+    Collab.ApiService.Repositories.MessageRepository
+>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

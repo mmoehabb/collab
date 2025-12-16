@@ -20,4 +20,22 @@ public class UserRepository : IUserRepository
 			select new { Id = user.Id, UserName = user.UserName, Email = user.Email };
 		return res.ToList().Select(u => new UserDto(u.Id, u.Email, u.UserName));
 	}
+
+	public UserDto? GetOne(string id)
+	{
+		var found = this._ctx.Users.SingleOrDefault(u => u.Id == id);
+		if (found == null) return null;
+		User u = found;
+		return new UserDto(u.Id, u.Email, u.UserName);
+	}
+
+	public User? GetOneUnsafe(string id)
+	{
+		return this._ctx.Users.SingleOrDefault(u => u.Id == id);
+	}
+
+	public bool Contains(string id)
+	{
+		return this._ctx.Users.Any(c => c.Id == id);
+	}
 }
